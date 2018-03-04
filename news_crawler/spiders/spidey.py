@@ -34,7 +34,7 @@ class SpideySpider(scrapy.Spider):
 
                 request = scrapy.Request(news.link, callback=self.parse_text)
                 request.meta['news'] = news
-                request.meta['index'] = index
+                request.meta['index'] = i
                 return request
 
     def parse_text(self, response):
