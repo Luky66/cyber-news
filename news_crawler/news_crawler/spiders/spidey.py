@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 import scrapy
 
-class CyberSpider(scrapy.Spider):
-    name = 'cyber-spider'
+
+class SpideySpider(scrapy.Spider):
+    name = 'spidey'
     start_urls = []
 
     def start_requests(self):
