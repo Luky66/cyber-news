@@ -23,7 +23,7 @@ class SpideySpider(scrapy.Spider):
                 yield {
                     'title': entry.css(sites[i].title_element_selector+' ::text').extract_first(),
                     'summary': entry.css(sites[i].summary_element_selector+' ::text').extract_first(),
-                    'link': entry-css(sites[i].entry_link_selector+' ::attr(href)').extract_first()
+                    'link': entry.css(sites[i].entry_link_selector+' ::attr(href)').extract_first()
                 }
 
 
