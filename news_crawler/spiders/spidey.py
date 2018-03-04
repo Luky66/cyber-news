@@ -41,7 +41,7 @@ class SpideySpider(scrapy.Spider):
         news = response.meta['news']
         i = response.meta['index']
 
-        paragraphs = entry.css(sites[i].text_paragraph_selector+' ::text').extract()
+        paragraphs = response.css(sites[i].text_paragraph_selector+' ::text').extract()
         news.text = '\n'.join([str(p) for p in paragraphs])
 
         yield news.makeJSON()
