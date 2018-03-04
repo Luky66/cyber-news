@@ -32,7 +32,7 @@ class SpideySpider(scrapy.Spider):
                     ""
                 )
 
-                request = scrapy.Request("http://www.example.com/some_page.html", callback=self.parse_text)
+                request = scrapy.Request(news.link, callback=self.parse_text)
                 request.meta['news'] = news
                 return request
 
@@ -66,7 +66,7 @@ class Site:
         self.title_element_selector = title_element_selector
         self.summary_element_selector = summary_element_selector
         self.entry_link_selector = entry_link_selector
-        self.text_paragraph_selector
+        self.text_paragraph_selector = text_paragraph_selector
 
 
 
