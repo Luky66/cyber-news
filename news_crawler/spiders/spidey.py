@@ -20,7 +20,11 @@ class SpideySpider(scrapy.Spider):
 
         for feed in response.css(sites[i].feed_element_selector):
             for entry in feed.css(sites[i].entry_element_selector):
-                yield {'title': entry.css(sites[i].title_element_selector+' ::text').extract_first()}
+                yield {
+                    'title': entry.css(sites[i].title_element_selector+' ::text').extract_first()
+                    'summary': entry.css(sites[i].summary_element_selector+' ::text').extract_first()
+                    'link': entry-css(sites[i].entry_link_selector+' @href').extract_first()
+                }
 
 
         # for next_page in response.css('div.prev-post > a'):
