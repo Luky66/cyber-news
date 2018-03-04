@@ -81,7 +81,7 @@ class News:
     datetime = ""
 
 
-    def __init__(self, title, summary, link, text, author, datetime)
+    def __init__(self, title, summary, link, text, author, datetime):
         self.title = title
         self.summary = summary
         self.link = link
@@ -89,7 +89,7 @@ class News:
         self.author = author
         self.datetime = datetime
         
-    def makeJSON(self)
+    def makeJSON(self):
         return {
                     'title': ,
                     'summary': 
