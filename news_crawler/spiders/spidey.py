@@ -91,10 +91,13 @@ class News:
         
     def makeJSON(self):
         return {
-                    'title': ,
-                    'summary': 
-                    'link': 
-                }
+            'title': self.title,
+            'summary': self.summary, 
+            'link': self.link,
+            'text': self.text,
+            'author': self.author,
+            'datetime': self.datetime
+        }
         
 
 
