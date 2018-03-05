@@ -121,9 +121,9 @@ sites = [
         "https://www.cybersecurityintelligence.com/", 
         "div.list-group",
         "div.teaser",
-        "h4",
+        "h4.list-group-item-heading a",
         "p.list-group-item-text",
-        "h4 a",
+        "h4.list-group-item-heading a",
         "#leftContent p",
         "footerLogo p+p"
     )]
