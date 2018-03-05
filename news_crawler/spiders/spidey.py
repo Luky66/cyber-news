@@ -7,26 +7,27 @@ class SpideySpider(scrapy.Spider):
     start_urls = []
 
     def start_requests(self):
-        for i, site in enumerate(sites):
+        for pageIndex, site in enumerate(sites):
             self.start_urls.append( site.url )
-            yield self.make_requests_from_url(site.url, {'index': i})
+            yield self.make_requests_from_url(site.url, {'pageIndex': pageIndex})
 
     def make_requests_from_url(self, url, meta):
        return scrapy.Request(url, callback=self.parse_feed, dont_filter=True, meta=meta)
 
 
     def parse_feed(self, response):
-        i = response.meta['index']
+        pageIndex = response.meta['pageIndex']
+        requests = []
 
-        for feed in response.css(sites[i].feed_element_selector):
-            for entry in feed.css(sites[i].entry_element_selector):
+        for feed in response.css(sites[pageIndex].feed_element_selector):
+            for entry in feed.css(sites[pageIndex].entry_element_selector):
 
                 # Construct news element and pass it along
 
-                news = News(
-                    entry.css(sites[i].title_element_selector+' ::text').extract_first(),
-                    entry.css(sites[i].summary_element_selector+' ::text').extract_first(),
-                    entry.css(sites[i].entry_link_selector+' ::attr(href)').extract_first(),
+                news = NewsObject(
+                    entry.css(sites[pageIndex].title_element_selector+' ::text').extract_first(),
+                    entry.css(sites[pageIndex].summary_element_selector+' ::text').extract_first(),
+                    entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first(),
                     "",
                     "",
                     ""
@@ -34,14 +35,16 @@ class SpideySpider(scrapy.Spider):
 
                 request = scrapy.Request(news.link, callback=self.parse_text)
                 request.meta['news'] = news
-                request.meta['index'] = i
-                return request
+                request.meta['pageIndex'] = pageIndex
+                requests.append(request)
+        
+        return requests
 
     def parse_text(self, response):
         news = response.meta['news']
-        i = response.meta['index']
+        pageIndex = response.meta['pageIndex']
 
-        paragraphs = response.css(sites[i].text_paragraph_selector+' ::text').extract()
+        paragraphs = response.css(sites[pageIndex].text_paragraph_selector+' ::text').extract()
         news.text = '\n'.join([p.encode('utf-8') for p in paragraphs])
 
         yield news.makeJSON()
@@ -71,7 +74,7 @@ class Site:
 
 
 
-class News:
+class NewsObject:
     """Defines all the things we want to store."""
 
     title = ""
