@@ -29,7 +29,6 @@ class SpideySpider(scrapy.Spider):
                     entry.css(sites[pageIndex].summary_element_selector+' ::text').extract_first(),
                     response.urljoin(entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first()),
                     "",
-                    "",
                     ""
                 )
 
@@ -46,6 +45,7 @@ class SpideySpider(scrapy.Spider):
 
         paragraphs = response.css(sites[pageIndex].text_paragraph_selector+' ::text').extract()
         news.text = '\n'.join([p.encode('utf-8') for p in paragraphs])
+        news.author = response.css(sites[pageIndex].author_selector+' ::text').extract_first()
 
         yield news.makeJSON()
 
@@ -62,7 +62,8 @@ class Site:
         title_element_selector, 
         summary_element_selector, 
         entry_link_selector,
-        text_paragraph_selector):
+        text_paragraph_selector,
+        author_selector):
 
         self.url = url
         self.feed_element_selector = feed_element_selector
@@ -71,6 +72,7 @@ class Site:
         self.summary_element_selector = summary_element_selector
         self.entry_link_selector = entry_link_selector
         self.text_paragraph_selector = text_paragraph_selector
+        self.author_selector = author_selector
 
 
 
@@ -82,16 +84,14 @@ class NewsObject:
     link = ""
     text = ""
     author = ""
-    datetime = ""
 
 
-    def __init__(self, title, summary, link, text, author, datetime):
+    def __init__(self, title, summary, link, text, author):
         self.title = title
         self.summary = summary
         self.link = link
         self.text = text
         self.author = author
-        self.datetime = datetime
         
     def makeJSON(self):
         return {
@@ -99,8 +99,7 @@ class NewsObject:
             'summary': self.summary, 
             'link': self.link,
             'text': self.text,
-            'author': self.author,
-            'datetime': self.datetime
+            'author': self.author
         }
         
 
@@ -115,5 +114,6 @@ sites = [
         "h4",
         "p.excerpt",
         "a",
-        "#article-content p"
+        "#article-content p",
+        "a.author-name[rel='author']"
     )]
