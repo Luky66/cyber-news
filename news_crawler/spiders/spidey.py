@@ -27,7 +27,7 @@ class SpideySpider(scrapy.Spider):
                 news = NewsObject(
                     entry.css(sites[pageIndex].title_element_selector+' ::text').extract_first(),
                     entry.css(sites[pageIndex].summary_element_selector+' ::text').extract_first(),
-                    entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first(),
+                    response.urljoin(entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first()),
                     "",
                     "",
                     ""
