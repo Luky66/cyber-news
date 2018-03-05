@@ -116,4 +116,14 @@ sites = [
         "a",
         "#article-content p",
         "a.author-name[rel='author']"
+    ),
+    Site(
+        "https://www.cybersecurityintelligence.com/", 
+        "div.list-group",
+        "div.teaser",
+        "h4",
+        "p.list-group-item-text",
+        "h4 a",
+        "#leftContent p",
+        "footerLogo p+p"
     )]
