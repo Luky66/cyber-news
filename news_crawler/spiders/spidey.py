@@ -24,7 +24,7 @@ class SpideySpider(scrapy.Spider):
 
                 # Construct news element and pass it along
 
-                news = NewsObject(
+                news = Article(
                     entry.css(sites[pageIndex].title_element_selector+' ::text').extract_first(),
                     entry.css(sites[pageIndex].summary_element_selector+' ::text').extract_first(),
                     response.urljoin(entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first()),
@@ -43,9 +43,19 @@ class SpideySpider(scrapy.Spider):
         news = response.meta['news']
         pageIndex = response.meta['pageIndex']
 
-        paragraphs = response.css(sites[pageIndex].text_paragraph_selector+' ::text').extract()
-        news.text = '\n'.join([p.encode('utf-8') for p in paragraphs])
-        news.author = response.css(sites[pageIndex].author_selector+' ::text').extract_first()
+        if sites[pageIndex].text_paragraph_selector:
+            paragraphs = response.css(sites[pageIndex].text_paragraph_selector).extract()
+            cleanParagraphs = []
+
+            for p in paragraphs:
+                cleanParagraphs = ''.join([p.encode('utf-8') for text in p.css("::text").extract()])
+
+            news.text = '\n'.join([p.encode('utf-8') for p in cleanParagraphs])
+            
+        if sites[pageIndex].author_selector:
+            news.author = response.css(sites[pageIndex].author_selector+' ::text').extract_first()
+        if sites[pageIndex].date_selector:
+            news.author = response.css(sites[pageIndex].date+' ::text').extract_first()
 
         yield news.makeJSON()
 
@@ -63,7 +73,8 @@ class Site:
         summary_element_selector, 
         entry_link_selector,
         text_paragraph_selector,
-        author_selector):
+        author_selector,
+        date_selector):
 
         self.url = url
         self.feed_element_selector = feed_element_selector
@@ -72,34 +83,42 @@ class Site:
         self.summary_element_selector = summary_element_selector
         self.entry_link_selector = entry_link_selector
         self.text_paragraph_selector = text_paragraph_selector
-        self.author_selector = author_selector
+        self.author_selector = author_selector,
+        self.date_selector = date_selector
 
 
 
-class NewsObject:
+class Article:
     """Defines all the things we want to store."""
 
     title = ""
+    author = ""
+    date = ""
     summary = ""
     link = ""
     text = ""
-    author = ""
+    page = ""
 
 
-    def __init__(self, title, summary, link, text, author):
+    def __init__(self, title, author, date, summary, link, text, page):
         self.title = title
+        self.author = author
+        self.date = date
         self.summary = summary
         self.link = link
         self.text = text
-        self.author = author
+        self.page = page
+        
         
     def makeJSON(self):
         return {
             'title': self.title,
+            'author': self.author,
+            'date': self.date
             'summary': self.summary, 
             'link': self.link,
             'text': self.text,
-            'author': self.author
+            'page': self.page
         }
         
 
@@ -115,7 +134,8 @@ sites = [
         "p.excerpt",
         "a",
         "#article-content p",
-        "a.author-name[rel='author']"
+        "a.author-name[rel='author']",
+        ""
     ),
     Site(
         "https://www.cybersecurityintelligence.com/", 
@@ -125,5 +145,6 @@ sites = [
         "p.list-group-item-text",
         "h4.list-group-item-heading a",
         "#leftContent p",
-        "footerLogo p+p"
+        "",
+        ""
     )]
