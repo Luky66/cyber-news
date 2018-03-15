@@ -46,11 +46,11 @@ class SpideySpider(scrapy.Spider):
         pageIndex = response.meta['pageIndex']
 
         if sites[pageIndex].text_paragraph_selector:
-            paragraphs = response.css(sites[pageIndex].text_paragraph_selector).extract()
+            paragraphs = response.css(sites[pageIndex].text_paragraph_selector)
             cleanParagraphs = []
 
             for p in paragraphs:
-                cleanParagraphs = ''.join([text.encode('utf-8') for text in p.css("::text").extract()])
+                cleanParagraphs.append(''.join([text.encode('utf-8') for text in p.css("::text").extract()]))
 
             news.text = '\n'.join([p.encode('utf-8') for p in cleanParagraphs])
 
