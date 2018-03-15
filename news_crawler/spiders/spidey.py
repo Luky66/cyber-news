@@ -26,12 +26,12 @@ class SpideySpider(scrapy.Spider):
 
                 news = Article(
                     entry.css(sites[pageIndex].title_element_selector+' ::text').extract_first(),
-                    "",
-                    "",
+                    "", #author
+                    "", #date
                     entry.css(sites[pageIndex].summary_element_selector+' ::text').extract_first(),
                     response.urljoin(entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first()),
-                    "",
-                    ""
+                    "", #text
+                    ""  #page
                 )
 
                 request = scrapy.Request(news.link, callback=self.parse_text)
@@ -57,7 +57,7 @@ class SpideySpider(scrapy.Spider):
         if sites[pageIndex].author_selector:
             news.author = response.css(sites[pageIndex].author_selector+' ::text').extract_first()
         if sites[pageIndex].date_selector:
-            news.author = response.css(sites[pageIndex].date+' ::text').extract_first()
+            news.date = response.css(sites[pageIndex].date_selector+' ::text').extract_first()
 
         yield news.makeJSON()
 
