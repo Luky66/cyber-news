@@ -50,7 +50,7 @@ class SpideySpider(scrapy.Spider):
             cleanParagraphs = []
 
             for p in paragraphs:
-                cleanParagraphs.append(''.join([text.encode('utf-8') for text in p.css("::text").extract()]))
+                cleanParagraphs.append(''.join([text for text in p.css("::text").extract()]))
 
             news.text = '\n'.join([p.encode('utf-8') for p in cleanParagraphs])
 
