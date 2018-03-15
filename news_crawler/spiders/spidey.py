@@ -26,6 +26,8 @@ class SpideySpider(scrapy.Spider):
 
                 news = Article(
                     entry.css(sites[pageIndex].title_element_selector+' ::text').extract_first(),
+                    "",
+                    "",
                     entry.css(sites[pageIndex].summary_element_selector+' ::text').extract_first(),
                     response.urljoin(entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first()),
                     "",
@@ -48,7 +50,7 @@ class SpideySpider(scrapy.Spider):
             cleanParagraphs = []
 
             for p in paragraphs:
-                cleanParagraphs = ''.join([p.encode('utf-8') for text in p.css("::text").extract()])
+                cleanParagraphs = ''.join([text.encode('utf-8') for text in p.css("::text").extract()])
 
             news.text = '\n'.join([p.encode('utf-8') for p in cleanParagraphs])
 
