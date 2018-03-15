@@ -51,7 +51,7 @@ class SpideySpider(scrapy.Spider):
                 cleanParagraphs = ''.join([p.encode('utf-8') for text in p.css("::text").extract()])
 
             news.text = '\n'.join([p.encode('utf-8') for p in cleanParagraphs])
-            
+
         if sites[pageIndex].author_selector:
             news.author = response.css(sites[pageIndex].author_selector+' ::text').extract_first()
         if sites[pageIndex].date_selector:
@@ -114,7 +114,7 @@ class Article:
         return {
             'title': self.title,
             'author': self.author,
-            'date': self.date
+            'date': self.date,
             'summary': self.summary, 
             'link': self.link,
             'text': self.text,
