@@ -85,7 +85,7 @@ class Site:
         self.summary_element_selector = summary_element_selector
         self.entry_link_selector = entry_link_selector
         self.text_paragraph_selector = text_paragraph_selector
-        self.author_selector = author_selector,
+        self.author_selector = author_selector
         self.date_selector = date_selector
 
 
