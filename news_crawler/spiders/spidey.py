@@ -7,46 +7,47 @@ class SpideySpider(scrapy.Spider):
     start_urls = []
 
     def start_requests(self):
-        for pageIndex, site in enumerate(sites):
+        for page_index, site in enumerate(sites):
             self.start_urls.append( site.url )
-            yield self.make_requests_from_url(site.url, {'pageIndex': pageIndex})
+            yield self.make_requests_from_url(site.url, {'page_index': page_index, 'page_name': site.page_name, 'page_domain': site.page_domain})
 
     def make_requests_from_url(self, url, meta):
        return scrapy.Request(url, callback=self.parse_feed, dont_filter=True, meta=meta)
 
 
     def parse_feed(self, response):
-        pageIndex = response.meta['pageIndex']
+        page_index = response.meta['page_index']
         requests = []
 
-        for feed in response.css(sites[pageIndex].feed_element_selector):
-            for entry in feed.css(sites[pageIndex].entry_element_selector):
+        for feed in response.css(sites[page_index].feed_element_selector):
+            for entry in feed.css(sites[page_index].entry_element_selector):
 
                 # Construct news element and pass it along
 
                 news = Article(
-                    entry.css(sites[pageIndex].title_element_selector+' ::text').extract_first(),
+                    entry.css(sites[page_index].title_element_selector+' ::text').extract_first(),
                     "", #author
                     "", #date
-                    entry.css(sites[pageIndex].summary_element_selector+' ::text').extract_first(),
-                    response.urljoin(entry.css(sites[pageIndex].entry_link_selector+' ::attr(href)').extract_first()),
+                    entry.css(sites[page_index].summary_element_selector+' ::text').extract_first(),
+                    response.urljoin(entry.css(sites[page_index].entry_link_selector+' ::attr(href)').extract_first()),
                     "", #text
-                    ""  #page
+                    response.meta['page_name'],
+                    response.meta['page_domain']
                 )
 
                 request = scrapy.Request(news.link, callback=self.parse_text)
                 request.meta['news'] = news
-                request.meta['pageIndex'] = pageIndex
+                request.meta['page_index'] = page_index
                 requests.append(request)
         
         return requests
 
     def parse_text(self, response):
         news = response.meta['news']
-        pageIndex = response.meta['pageIndex']
+        page_index = response.meta['page_index']
 
-        if sites[pageIndex].text_paragraph_selector:
-            paragraphs = response.css(sites[pageIndex].text_paragraph_selector)
+        if sites[page_index].text_paragraph_selector:
+            paragraphs = response.css(sites[page_index].text_paragraph_selector)
             cleanParagraphs = []
 
             for p in paragraphs:
@@ -54,10 +55,10 @@ class SpideySpider(scrapy.Spider):
 
             news.text = '\n'.join([p.encode('utf-8') for p in cleanParagraphs])
 
-        if sites[pageIndex].author_selector:
-            news.author = response.css(sites[pageIndex].author_selector+' ::text').extract_first()
-        if sites[pageIndex].date_selector:
-            news.date = response.css(sites[pageIndex].date_selector+' ::text').extract_first()
+        if sites[page_index].author_selector:
+            news.author = response.css(sites[page_index].author_selector+' ::text').extract_first()
+        if sites[page_index].date_selector:
+            news.date = response.css(sites[page_index].date_selector+' ::text').extract_first()
 
         yield news.makeJSON()
 
@@ -68,6 +69,8 @@ class Site:
     """A crawlable news site."""
 
     def __init__(self, 
+        page_name,
+        page_domain,
         url, 
         feed_element_selector, 
         entry_element_selector, 
@@ -78,6 +81,8 @@ class Site:
         author_selector,
         date_selector):
 
+        self.page_name = page_name
+        self.page_domain = page_domain
         self.url = url
         self.feed_element_selector = feed_element_selector
         self.entry_element_selector = entry_element_selector
@@ -99,17 +104,18 @@ class Article:
     summary = ""
     link = ""
     text = ""
-    page = ""
+    page_name = ""
+    page_domain = ""
 
 
-    def __init__(self, title, author, date, summary, link, text, page):
+    def __init__(self, title, author, date, summary, link, text, page_name, page_domain):
         self.title = title
         self.author = author
         self.date = date
         self.summary = summary
         self.link = link
         self.text = text
-        self.page = page
+        self.page_name = page_domain
         
         
     def makeJSON(self):
@@ -120,7 +126,8 @@ class Article:
             'summary': self.summary, 
             'link': self.link,
             'text': self.text,
-            'page': self.page
+            'page_name': self.page_name,
+            'page_domain': self.page_domain
         }
         
 
@@ -129,6 +136,8 @@ class Article:
 
 sites = [
     Site(
+        "Fifthdomain",
+        "fifthdomain.com"
         "https://www.fifthdomain.com/dod/", 
         "div.result-listing",
         "article",
@@ -140,6 +149,8 @@ sites = [
         ""
     ),
     Site(
+        "Cybersecurity Intelligence",
+        "cybersecurityintelligence.com"
         "https://www.cybersecurityintelligence.com/", 
         "div.list-group",
         "div.teaser",
