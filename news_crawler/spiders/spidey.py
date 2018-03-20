@@ -115,7 +115,8 @@ class Article:
         self.summary = summary
         self.link = link
         self.text = text
-        self.page_name = page_domain
+        self.page_name = page_name
+        self.page_domain = page_domain
         
         
     def makeJSON(self):
@@ -137,7 +138,7 @@ class Article:
 sites = [
     Site(
         "Fifthdomain",
-        "fifthdomain.com"
+        "fifthdomain.com",
         "https://www.fifthdomain.com/dod/", 
         "div.result-listing",
         "article",
@@ -150,7 +151,7 @@ sites = [
     ),
     Site(
         "Cybersecurity Intelligence",
-        "cybersecurityintelligence.com"
+        "cybersecurityintelligence.com",
         "https://www.cybersecurityintelligence.com/", 
         "div.list-group",
         "div.teaser",
